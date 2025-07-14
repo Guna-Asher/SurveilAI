@@ -87,8 +87,7 @@ You can use the **IP Webcam** Android app for local streaming.
 surveilai/
 │
 ├── app.py                 # Flask server + detection logic
-├── templates/
-│   └── index.html         # TailwindCSS-powered dashboard
+├── index.html             # TailwindCSS-powered dashboard
 ├── static/                # Optional frontend assets
 ├── requirements.txt       # Python dependencies
 └── README.md              # Full project documentation
