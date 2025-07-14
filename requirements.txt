@@ -1,0 +1,7 @@
+Flask==2.3.2
+ultralytics==8.1.25
+numpy==1.26.4
+opencv-python==4.9.0.80
+Pillow==10.0.0
+setuptools>=65.0.0
+wheel>=0.38.4
