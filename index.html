@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SurveilAI | Detection Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::selection {
+      background-color: #60a5fa;
+      color: #fff;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-gray-950 to-gray-900 text-white font-sans tracking-tight">
+
+  <!-- Sidebar -->
+  <aside class="fixed top-0 left-0 h-screen w-48 bg-gray-900 px-4 py-8 border-r border-gray-800 shadow">
+    <h1 class="text-xl font-bold text-blue-400 mb-10">
+      Surveil<span class="text-white">AI</span>
+    </h1>
+    <nav class="space-y-5 text-sm text-gray-400">
+      <a href="#overview" class="flex items-center gap-2 hover:text-blue-300 transition">📊 <span>Overview</span></a>
+      <a href="#detection" class="flex items-center gap-2 hover:text-blue-300 transition">🖼️ <span>Image Detection</span></a>
+      <a href="#models" class="flex items-center gap-2 hover:text-blue-300 transition">🧠 <span>Model Explorer</span></a>
+    </nav>
+    <footer class="absolute bottom-4 text-gray-500 text-xs">
+      ©️ 2025 MCA Project – DSCE Bengaluru
+    </footer>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-48 px-10 py-12 space-y-16">
+
+    <!-- System Overview -->
+    <section id="overview">
+      <h2 class="text-3xl font-bold text-white mb-2">📊 System Overview</h2>
+      <p class="text-gray-400 mb-6 max-w-2xl">SurveilAI combines YOLOv8 with a modern UI for accurate object detection from uploaded images.</p>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="bg-gradient-to-tr from-purple-600 to-pink-500 p-5 rounded-xl shadow-sm hover:shadow-md transition">
+          <h3 class="font-bold text-lg mb-1">YOLOv8</h3>
+          <p class="text-sm text-gray-100">Cutting-edge deep learning for precision detection.</p>
+        </div>
+        <div class="bg-gradient-to-tr from-green-600 to-teal-500 p-5 rounded-xl shadow-sm hover:shadow-md transition">
+          <h3 class="font-bold text-lg mb-1">SSD</h3>
+          <p class="text-sm text-gray-100">Compact and fast for embedded systems.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Image Detection -->
+    <section id="detection" class="max-w-xl">
+      <h2 class="text-2xl font-semibold text-white mb-4">🖼️ Image Detection</h2>
+      <div class="bg-gray-900 bg-opacity-70 backdrop-blur-sm p-6 rounded-xl border border-gray-800 shadow space-y-5">
+
+        <!-- Preview -->
+        <div class="bg-gray-800 rounded-md p-3 max-h-64 overflow-hidden flex justify-center items-center">
+          <img id="previewImage" src="" alt="Preview" class="max-h-56 object-contain rounded hidden" />
+        </div>
+
+        <!-- Upload Form -->
+        <form id="uploadForm" class="space-y-3">
+          <input type="file" id="fileInput" accept="image/*"
+                 class="w-full bg-gray-100 text-black p-2 rounded text-sm focus:outline-none focus:ring focus:ring-blue-400" />
+          <button type="submit"
+                  class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded text-white text-sm font-medium transition">
+            🔍 Detect from Image
+          </button>
+        </form>
+
+        <!-- Results -->
+        <pre id="results"
+             class="bg-gray-800 text-green-400 text-sm p-3 rounded whitespace-pre-wrap overflow-x-auto border border-gray-700"></pre>
+      </div>
+    </section>
+
+    <!-- Model Explorer -->
+    <section id="models">
+      <h2 class="text-2xl font-semibold text-white mb-4">🧠 Model Explorer</h2>
+      <div class="grid gap-2 md:grid-cols-2">
+        <div class="bg-gray-900 p-5 rounded-lg border border-gray-600 hover:border-purple-400 hover:shadow transition">
+          <h4 class="font-semibold text-purple-400 text-lg mb-1">YOLOv8</h4>
+          <p class="text-sm text-gray-300">High precision with real-time capability.</p>
+          <span class="text-xs bg-purple-700 px-2 py-1 rounded-full text-white inline-block mt-2">Accuracy: Very High</span>
+        </div>
+        <div class="bg-gray-900 p-5 rounded-lg border border-gray-600 hover:border-green-400 hover:shadow transition">
+          <h4 class="font-semibold text-green-400 text-lg mb-1">SSD</h4>
+          <p class="text-sm text-gray-300">Lightweight model ideal for edge devices.</p>
+          <span class="text-xs bg-green-700 px-2 py-1 rounded-full text-white inline-block mt-2">Efficiency: Maximum</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Script -->
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const previewImage = document.getElementById("previewImage");
+    const uploadForm = document.getElementById("uploadForm");
+    const resultsEl = document.getElementById("results");
+
+    // Preview selected image
+    fileInput.onchange = () => {
+      const file = fileInput.files[0];
+      if (file) {
+        previewImage.src = URL.createObjectURL(file);
+        previewImage.classList.remove("hidden");
+      }
+    };
+
+    // Handle image upload
+    uploadForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) {
+        resultsEl.innerText = "⚠️ No image selected.";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/detect-image", { method: "POST", body: formData });
+        const blob = await res.blob();
+        previewImage.src = URL.createObjectURL(blob);
+        previewImage.classList.remove("hidden");
+        resultsEl.innerText = "✅ Detection completed.";
+      } catch {
+        resultsEl.innerText = "❌ Server error. Try again.";
+      }
+    };
+  </script>
+</body>
+</html>
